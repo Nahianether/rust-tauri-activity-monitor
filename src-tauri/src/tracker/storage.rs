@@ -161,11 +161,13 @@ impl Storage {
 
         Ok(rows
             .into_iter()
-            .map(|(bucket_minute, app_name, duration_seconds)| TimelineSegment {
-                bucket_minute,
-                app_name,
-                duration_seconds,
-            })
+            .map(
+                |(bucket_minute, app_name, duration_seconds)| TimelineSegment {
+                    bucket_minute,
+                    app_name,
+                    duration_seconds,
+                },
+            )
             .collect())
     }
 
@@ -212,7 +214,9 @@ mod tests {
     use crate::settings::Theme;
 
     async fn fresh_storage() -> Storage {
-        Storage::open("sqlite::memory:").await.expect("open in-memory")
+        Storage::open("sqlite::memory:")
+            .await
+            .expect("open in-memory")
     }
 
     #[tokio::test]
@@ -268,10 +272,11 @@ mod tests {
     #[tokio::test]
     async fn settings_round_trip() {
         let s = fresh_storage().await;
-        let mut settings = Settings::default();
-        settings.idle_threshold_seconds = 600;
-        settings.theme = Theme::Dark;
-        settings.tracking_enabled = false;
+        let settings = Settings {
+            idle_threshold_seconds: 600,
+            theme: Theme::Dark,
+            tracking_enabled: false,
+        };
         s.save_settings(&settings).await.unwrap();
 
         let loaded = s.load_settings().await.unwrap();
@@ -283,11 +288,15 @@ mod tests {
     #[tokio::test]
     async fn bucket_alignment_snaps_to_5_minutes() {
         // Sanity-check the bucket math the increment() function uses.
-        assert_eq!((0 / BUCKET_MINUTES) * BUCKET_MINUTES, 0);
-        assert_eq!((4 / BUCKET_MINUTES) * BUCKET_MINUTES, 0);
-        assert_eq!((5 / BUCKET_MINUTES) * BUCKET_MINUTES, 5);
-        assert_eq!((9 / BUCKET_MINUTES) * BUCKET_MINUTES, 5);
-        assert_eq!((63 / BUCKET_MINUTES) * BUCKET_MINUTES, 60);
-        assert_eq!((1435 / BUCKET_MINUTES) * BUCKET_MINUTES, 1435);
+        // Wrap in a fn to keep clippy from const-folding individual cases away.
+        fn snap(m: i64) -> i64 {
+            (m / BUCKET_MINUTES) * BUCKET_MINUTES
+        }
+        assert_eq!(snap(0), 0);
+        assert_eq!(snap(4), 0);
+        assert_eq!(snap(5), 5);
+        assert_eq!(snap(9), 5);
+        assert_eq!(snap(63), 60);
+        assert_eq!(snap(1435), 1435);
     }
 }

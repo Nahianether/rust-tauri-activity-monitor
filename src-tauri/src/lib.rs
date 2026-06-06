@@ -27,7 +27,8 @@ pub fn run() {
             // Build the tray menu. We keep both "Pause" and "Resume" items in the
             // menu and toggle their `enabled` state instead of mutating the menu
             // contents — same UX on every platform with less code.
-            let show_item = MenuItem::with_id(app, TRAY_SHOW, "Show TimeAtlas", true, None::<&str>)?;
+            let show_item =
+                MenuItem::with_id(app, TRAY_SHOW, "Show TimeAtlas", true, None::<&str>)?;
             let pause_item =
                 MenuItem::with_id(app, TRAY_PAUSE, "Pause tracking", true, None::<&str>)?;
             let resume_item =

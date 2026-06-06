@@ -8,5 +8,5 @@ pub fn seconds_since_input() -> Option<u64> {
 
 /// True if no input has been observed for at least `threshold_seconds`.
 pub fn is_idle(threshold_seconds: u64) -> bool {
-    seconds_since_input().map_or(false, |s| s >= threshold_seconds)
+    seconds_since_input().is_some_and(|s| s >= threshold_seconds)
 }

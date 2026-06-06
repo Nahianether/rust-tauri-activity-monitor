@@ -55,7 +55,10 @@ pub async fn run_loop(state: Arc<Mutex<TrackerState>>) -> Result<()> {
 
         let (enabled, idle_threshold) = {
             let s = state.lock().await;
-            (s.settings.tracking_enabled, s.settings.idle_threshold_seconds)
+            (
+                s.settings.tracking_enabled,
+                s.settings.idle_threshold_seconds,
+            )
         };
 
         if !enabled || idle::is_idle(idle_threshold) {
