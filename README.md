@@ -3,7 +3,6 @@
 > A **personal**, **local-only** time-awareness desktop app for developers and knowledge workers.
 > Built with Tauri 2 + Rust + React.
 
-[![CI](https://github.com/Nahianether/rust-tauri-activity-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/Nahianether/rust-tauri-activity-monitor/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2021-orange.svg?logo=rust)](https://www.rust-lang.org/)
 [![Tauri](https://img.shields.io/badge/tauri-2.x-FFC131.svg?logo=tauri&logoColor=black)](https://tauri.app/)
@@ -101,7 +100,7 @@ Settings are stored in `~/.timeatlas/db.sqlite` alongside your activity data. Ti
 - ✅ **Light & dark themes** — Auto follows OS `prefers-color-scheme`, switches without restart
 - ✅ **Persisted settings** — idle threshold, theme, tracking-enabled toggle
 - ✅ **6 storage unit tests** — increment aggregation, summary grouping, timeline bucketing, settings round-trip
-- ✅ **Clippy-clean, rustfmt-checked, CI on every push**
+- ✅ **Clippy-clean, rustfmt-checked** — see [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the pre-PR check list
 
 ---
 

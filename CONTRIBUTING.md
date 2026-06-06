@@ -44,7 +44,7 @@ on frontend changes via Vite HMR.
 
 ## Running checks before opening a PR
 
-These are the same checks CI runs. Please make sure all pass:
+Please make sure all of these pass before submitting:
 
 ```bash
 # Frontend (TypeScript + Vite)
