@@ -1,0 +1,27 @@
+# Node
+node_modules/
+.vite/
+
+# Vite build output — only the placeholder index.html is committed (see dist/index.html)
+dist/*
+!dist/index.html
+
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Local data (DB lives in user home, but just in case)
+*.sqlite
+*.sqlite-journal
+*.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Env
+.env
+.env.local
