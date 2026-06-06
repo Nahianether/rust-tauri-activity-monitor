@@ -1,7 +1,12 @@
-/// Idle detection — returns true if no input activity for longer than the
-/// configured threshold. Currently a stub; v0.1 will wire up platform-specific
-/// `GetLastInputInfo` (Windows), `CGEventSourceSecondsSinceLastEventType`
-/// (macOS), and X11/Wayland equivalents.
-pub fn is_idle() -> bool {
-    false
+use user_idle::UserIdle;
+
+/// Seconds since the last keyboard or mouse input, cross-platform.
+/// Returns `None` if the platform API is unavailable (e.g. some Wayland sessions).
+pub fn seconds_since_input() -> Option<u64> {
+    UserIdle::get_time().ok().map(|idle| idle.as_seconds())
+}
+
+/// True if no input has been observed for at least `threshold_seconds`.
+pub fn is_idle(threshold_seconds: u64) -> bool {
+    seconds_since_input().map_or(false, |s| s >= threshold_seconds)
 }

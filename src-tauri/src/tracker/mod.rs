@@ -3,46 +3,49 @@ mod idle;
 mod storage;
 
 use anyhow::Result;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::Mutex;
 use tokio::time::interval;
 
-use storage::Storage;
+pub use storage::{ActivityEntry, Storage, TimelineSegment};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ActivityEntry {
-    pub app_name: String,
-    pub window_title: String,
-    pub duration_seconds: i64,
-}
+use crate::settings::Settings;
 
 pub struct TrackerState {
-    pub enabled: bool,
+    pub settings: Settings,
     storage: Option<Storage>,
 }
 
 impl TrackerState {
     pub fn new() -> Self {
-        Self { enabled: true, storage: None }
+        Self {
+            settings: Settings::default(),
+            storage: None,
+        }
     }
 
-    pub async fn today_summary(&self) -> Result<Vec<ActivityEntry>> {
-        match &self.storage {
-            Some(s) => s.today_summary().await,
-            None => Ok(vec![]),
-        }
+    pub fn storage(&self) -> Option<&Storage> {
+        self.storage.as_ref()
     }
 }
 
-/// Main tracker loop — polls active window once per second and persists
-/// elapsed time per (app, window_title) bucket.
+/// Main tracker loop. Polls the active window once per second and persists
+/// elapsed time into the 5-minute bucket that contains the current moment.
+///
+/// Skips writes when:
+///   - `settings.tracking_enabled == false` (user-paused)
+///   - the user is idle (no input for `settings.idle_threshold_seconds`)
+///   - no foreground window can be identified
 pub async fn run_loop(state: Arc<Mutex<TrackerState>>) -> Result<()> {
     let storage = Storage::new().await?;
     {
+        // Stash the storage handle and replace defaults with persisted settings.
         let mut s = state.lock().await;
         s.storage = Some(storage.clone());
+        if let Ok(loaded) = storage.load_settings().await {
+            s.settings = loaded;
+        }
     }
 
     let mut ticker = interval(Duration::from_secs(1));
@@ -50,8 +53,12 @@ pub async fn run_loop(state: Arc<Mutex<TrackerState>>) -> Result<()> {
     loop {
         ticker.tick().await;
 
-        let enabled = state.lock().await.enabled;
-        if !enabled || idle::is_idle() {
+        let (enabled, idle_threshold) = {
+            let s = state.lock().await;
+            (s.settings.tracking_enabled, s.settings.idle_threshold_seconds)
+        };
+
+        if !enabled || idle::is_idle(idle_threshold) {
             continue;
         }
 

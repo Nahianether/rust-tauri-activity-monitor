@@ -1,6 +1,6 @@
 [package]
 name = "timeatlas"
-version = "0.1.0"
+version = "0.2.0"
 description = "Personal, local-only time-awareness desktop app"
 authors = ["Nahianether"]
 license = "MIT"
@@ -23,6 +23,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"
 sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite", "chrono", "macros"] }
 chrono = { version = "0.4", features = ["serde"] }
 active-win-pos-rs = "0.8"
+user-idle = "0.6"
 dirs = "5"
 anyhow = "1"
 thiserror = "1"
